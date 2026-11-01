@@ -23,7 +23,7 @@
       --dark: #123426;
       --muted: #486555;
       --rule: rgba(6, 73, 54, .25);
-      --radius: 2px;
+      --radius: 16px;
       --max: 1216px;
       --shadow: 5px 5px 0 var(--green);
       --font-title: Georgia, 'Times New Roman', Times, serif;
@@ -285,6 +285,22 @@
       .product-title { flex: 1 1 175px; }
       .product-price { margin-left: auto; }
     }
+
+    /* Rounded controls and private-event enquiries. */
+    .qty-control { border-radius: var(--radius); }
+    .qty-control button { border-radius: 12px; }
+    .mobile-bag { border-radius: var(--radius); }
+    .pizza-size-note { margin: -3px 0 20px; max-width: 650px; color: var(--muted); font-size: .95rem; line-height: 1.5; }
+    .party-section { padding: 72px 0; border-top: 2px solid var(--green); }
+    .party-layout { display: grid; grid-template-columns: 1.1fr .9fr; align-items: center; gap: 40px; }
+    .party-title { margin: 12px 0 0; color: var(--red); font: 900 clamp(2.7rem, 5.5vw, 4.8rem)/1.02 var(--font-title); letter-spacing: -.055em; }
+    .party-copy p { margin: 0 0 22px; max-width: 500px; font-size: 1.08rem; line-height: 1.55; }
+    .party-copy .party-tagline { margin: 22px 0 0; font: italic 900 1.5rem/1.2 var(--font-title); }
+    @media (max-width: 740px) {
+      .party-section { padding: 56px 0; }
+      .party-layout { grid-template-columns: 1fr; gap: 24px; }
+      .party-copy .button { width: 100%; }
+    }
   </style>
 </head>
 <body>
@@ -330,7 +346,6 @@
             <h2 class="section-heading" id="menu-title">Nuestro menú.</h2>
             <p class="section-desc">Lo bueno va directo a la mesa. Elige lo que te gusta y arma tu pedido para consultar disponibilidad.</p>
           </div>
-          <div class="section-stamp" aria-hidden="true">¡CON<br>HAMBRE<br>SE COME<br>MEJOR!</div>
         </div>
         <div id="menu-products"></div>
         <noscript><p class="noscript-note">Activa JavaScript para ver el menú interactivo y calcular tu pedido. También puedes <a href="https://wa.me/56982677552">consultar el menú y reservar con Romi por WhatsApp</a>.</p></noscript>
@@ -384,6 +399,20 @@
       </div>
     </section>
 
+    <section class="party-section" id="pizza-party" aria-labelledby="party-title">
+      <div class="wrap party-layout">
+        <div>
+          <p class="eyebrow"><span class="section-number">04 /</span> LA NANCY EN TU EVENTO</p>
+          <h2 class="party-title" id="party-title">¡Cotiza tu<br>Pizza Party!</h2>
+        </div>
+        <div class="party-copy">
+          <p>Llevamos el horno y preparamos pizzas artesanales en vivo para tu celebración. Cuéntanos la fecha, el lugar y cuántos invitados tienes, y armamos una propuesta para ti.</p>
+          <a class="button button-red" id="pizza-party-button" href="https://wa.me/56982677552?text=%C2%A1Hola%2C%20Romi!%20Quiero%20cotizar%20un%20Pizza%20Party%20con%20La%20Nancy." target="_blank" rel="noopener noreferrer">Cotizar mi Pizza Party ↗</a>
+          <p class="party-tagline">Pizza rica donde sea.</p>
+        </div>
+      </div>
+    </section>
+
     <section class="story-section" aria-labelledby="story-title">
       <div class="wrap story-layout">
         <h2 id="story-title">De nuestro horno<br>a tu mesa. ✳</h2>
@@ -416,8 +445,8 @@
     });
 
     const PRODUCTS = [
-      { id:'margarita', category:'Pizzas', name:'Margarita', price:6000, description:'Salsa de tomates La Nancy, mozzarella, fior di latte, albahaca, parmesano y oliva.', unit:'Pizza' },
-      { id:'pepperoni-pesto', category:'Pizzas', name:'Pepperoni Pesto', price:7000, description:'Salsa de tomates La Nancy, mozzarella, pepperoni, shot de pesto y parmesano.', unit:'Pizza' },
+      { id:'margarita', category:'Pizzas medianas', name:'Margarita', price:6000, description:'Salsa de tomates La Nancy, mozzarella, fior di latte, albahaca, parmesano y oliva.', unit:'Pizza mediana' },
+      { id:'pepperoni-pesto', category:'Pizzas medianas', name:'Pepperoni Pesto', price:7000, description:'Salsa de tomates La Nancy, mozzarella, pepperoni, shot de pesto y parmesano.', unit:'Pizza mediana' },
       { id:'pizza-dog', category:'Lanzamiento', name:'Pizza Dog', price:3500, description:'Queso mozzarella, salchicha, palta y pebre de la Lucy.', unit:'Unidad' },
       { id:'focaccia', category:'Panadería', name:'Focaccia tradicional', price:3000, description:'Orégano, sal de Cáhuil y aceite de oliva.', unit:'Unidad' },
       { id:'pan-amasado', category:'Panadería', name:'Pan amasado artesanal', price:2000, description:'Pack de 4 unidades.', unit:'Pack de 4' }
@@ -426,7 +455,7 @@
     const clpFormat = new Intl.NumberFormat('es-CL', { maximumFractionDigits:0 });
     const money = number => '$' + clpFormat.format(number);
     const $ = id => document.getElementById(id);
-    const categories = ['Pizzas', 'Lanzamiento', 'Panadería'];
+    const categories = ['Pizzas medianas', 'Lanzamiento', 'Panadería'];
     let copyRevision = 0;
 
     function makeElement(tag, className, text) {
@@ -444,6 +473,9 @@
         const heading = makeElement('h3', 'category-heading' + (category === 'Lanzamiento' ? ' launch' : ''));
         heading.append(makeElement('span','',category));
         section.append(heading);
+        if (category === 'Pizzas medianas') {
+          section.append(makeElement('p', 'pizza-size-note', 'También tenemos pizzas tamaño grande para nuestros Pop-Up. Consulta las opciones y precios de cada evento.'));
+        }
         const grid = makeElement('div','products-grid');
         for (const product of PRODUCTS.filter(item => item.category === category)) {
           const card = makeElement('article','product-card');
@@ -491,7 +523,7 @@
       } else {
         for (const product of selectedProducts()) {
           const item = makeElement('li','order-line');
-          item.append(makeElement('span','',quantities[product.id] + ' × ' + product.name),makeElement('strong','',money(quantities[product.id]*product.price)));
+          item.append(makeElement('span','',quantities[product.id] + ' × ' + product.name + (product.unit === 'Pizza mediana' ? ' (mediana)' : '')),makeElement('strong','',money(quantities[product.id]*product.price)));
           orderList.append(item);
         }
       }
@@ -520,7 +552,7 @@
     function generateMessage() {
       const selected = selectedProducts();
       if (!selected.length) return `¡Hola, ${CONFIG.whatsappName}! Quiero consultar disponibilidad y cómo reservar en La Nancy. ¡Gracias!`;
-      const lines = selected.map(p => '- ' + quantities[p.id] + ' × ' + p.name + ' — ' + money(quantities[p.id] * p.price));
+      const lines = selected.map(p => '- ' + quantities[p.id] + ' × ' + p.name + (p.unit === 'Pizza mediana' ? ' (mediana)' : '') + ' — ' + money(quantities[p.id] * p.price));
       return [`¡Hola, ${CONFIG.whatsappName}! Quiero consultar una reserva en La Nancy:`, ...lines,
         'Total referencial: ' + money(calculateTotal()),
         '¿Me confirmas disponibilidad, horario y lugar de retiro? ¡Gracias!'].join('\n');
@@ -598,6 +630,7 @@
     const footerWhatsApp = document.querySelector('.footer-links a[href^="https://wa.me/"]');
     footerWhatsApp.href = whatsappUrl();
     footerWhatsApp.textContent = 'WhatsApp de ' + CONFIG.whatsappName + ' ↗';
+    $('pizza-party-button').href = 'https://wa.me/' + CONFIG.whatsappNumber + '?text=' + encodeURIComponent(`¡Hola, ${CONFIG.whatsappName}! Quiero cotizar un Pizza Party con La Nancy.\nFecha del evento: \nLugar: \nCantidad de invitados: `);
     $('instagram-button').addEventListener('click',reserveOnInstagram);
     renderMenu();
     updateOrder();
