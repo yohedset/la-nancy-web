@@ -448,6 +448,9 @@
       { id:'margarita', category:'Pizzas medianas', name:'Margarita', price:6000, description:'Salsa de tomates La Nancy, mozzarella, fior di latte, albahaca, parmesano y oliva.', unit:'Pizza mediana' },
       { id:'pepperoni-pesto', category:'Pizzas medianas', name:'Pepperoni Pesto', price:7000, description:'Salsa de tomates La Nancy, mozzarella, pepperoni, shot de pesto y parmesano.', unit:'Pizza mediana' },
       { id:'choclera', category:'Pizzas medianas', name:'Choclera', price:7000, description:'Salsa de tomates La Nancy, mozzarella, choclitos, champiñón, aceitunas, parmesano.', unit:'Pizza mediana' },
+      { id:'margarita-grande', category:'Pizzas grandes', name:'Margarita', price:9000, description:'Salsa de tomates La Nancy, mozzarella, fior di latte, albahaca, parmesano y oliva.', unit:'Pizza grande' },
+      { id:'pepperoni-pesto-grande', category:'Pizzas grandes', name:'Pepperoni Pesto', price:10000, description:'Salsa de tomates La Nancy, mozzarella, pepperoni, shot de pesto y parmesano.', unit:'Pizza grande' },
+      { id:'choclera-grande', category:'Pizzas grandes', name:'Choclera', price:10000, description:'Salsa de tomates La Nancy, mozzarella, choclitos, champiñón, aceitunas, parmesano.', unit:'Pizza grande' },
       { id:'pizza-dog-completo', category:'Pizza Dog', name:'Completo', price:3500, description:'Salchicha española, Palta Hass, Tomate, Mayonesa (+ Opción de aderezos y pebre de La Lucy).', unit:'Unidad' },
       { id:'pizza-dog-hot-dog', category:'Pizza Dog', name:'Hot-Dog', price:3000, description:'Salchicha española, Mostaza (+ Opción de aderezos y pebre de La Lucy).', unit:'Unidad' },
       { id:'focaccia', category:'Panadería', name:'Focaccia tradicional', price:3000, description:'Orégano, sal de Cáhuil y aceite de oliva.', unit:'Unidad' },
@@ -457,7 +460,7 @@
     const clpFormat = new Intl.NumberFormat('es-CL', { maximumFractionDigits:0 });
     const money = number => '$' + clpFormat.format(number);
     const $ = id => document.getElementById(id);
-    const categories = ['Pizzas medianas', 'Pizza Dog', 'Panadería'];
+    const categories = ['Pizzas medianas', 'Pizzas grandes', 'Pizza Dog', 'Panadería'];
     let copyRevision = 0;
 
     function makeElement(tag, className, text) {
@@ -465,6 +468,10 @@
       if (className) element.className = className;
       if (text !== undefined) element.textContent = text;
       return element;
+    }
+
+    function productLabel(product) {
+      return product.name + (product.unit === 'Pizza mediana' ? ' (mediana)' : product.unit === 'Pizza grande' ? ' (grande)' : '');
     }
 
     function renderMenu() {
@@ -475,8 +482,8 @@
         const heading = makeElement('h3', 'category-heading' + (category === 'Pizza Dog' ? ' launch' : ''));
         heading.append(makeElement('span','',category));
         section.append(heading);
-        if (category === 'Pizzas medianas') {
-          section.append(makeElement('p', 'pizza-size-note', 'También tenemos pizzas tamaño grande para nuestros Pop-Up. Consulta las opciones y precios de cada evento.'));
+        if (category === 'Pizzas grandes') {
+          section.append(makeElement('p', 'pizza-size-note', 'Pizzas grandes para nuestros Pop-Up. Disponibilidad sujeta a confirmación.'));
         }
         const grid = makeElement('div','products-grid');
         for (const product of PRODUCTS.filter(item => item.category === category)) {
@@ -490,16 +497,16 @@
           const unit = makeElement('span','item-caption',product.unit);
           const control = makeElement('div','qty-control');
           control.setAttribute('role','group');
-          control.setAttribute('aria-label','Cantidad de ' + product.name);
+          control.setAttribute('aria-label','Cantidad de ' + productLabel(product));
           const minus = makeElement('button','','−');
           minus.type = 'button'; minus.dataset.id = product.id; minus.dataset.action = 'decrease';
-          minus.setAttribute('aria-label','Quitar una unidad de ' + product.name);
+          minus.setAttribute('aria-label','Quitar una unidad de ' + productLabel(product));
           const qty = makeElement('output','qty-output','0');
           qty.id = 'quantity-' + product.id;
-          qty.setAttribute('aria-label','Cantidad seleccionada de ' + product.name);
+          qty.setAttribute('aria-label','Cantidad seleccionada de ' + productLabel(product));
           const plus = makeElement('button','','+');
           plus.type = 'button'; plus.dataset.id = product.id; plus.dataset.action = 'increase';
-          plus.setAttribute('aria-label','Agregar una unidad de ' + product.name);
+          plus.setAttribute('aria-label','Agregar una unidad de ' + productLabel(product));
           control.append(minus,qty,plus);
           bottom.append(unit,control);
           card.append(cardHead,desc,bottom);
@@ -525,7 +532,7 @@
       } else {
         for (const product of selectedProducts()) {
           const item = makeElement('li','order-line');
-          item.append(makeElement('span','',quantities[product.id] + ' × ' + product.name + (product.unit === 'Pizza mediana' ? ' (mediana)' : '')),makeElement('strong','',money(quantities[product.id]*product.price)));
+          item.append(makeElement('span','',quantities[product.id] + ' × ' + productLabel(product)),makeElement('strong','',money(quantities[product.id]*product.price)));
           orderList.append(item);
         }
       }
@@ -554,7 +561,7 @@
     function generateMessage() {
       const selected = selectedProducts();
       if (!selected.length) return `¡Hola, ${CONFIG.whatsappName}! Quiero consultar disponibilidad y cómo reservar en La Nancy. ¡Gracias!`;
-      const lines = selected.map(p => '- ' + quantities[p.id] + ' × ' + p.name + (p.unit === 'Pizza mediana' ? ' (mediana)' : '') + ' — ' + money(quantities[p.id] * p.price));
+      const lines = selected.map(p => '- ' + quantities[p.id] + ' × ' + productLabel(p) + ' — ' + money(quantities[p.id] * p.price));
       return [`¡Hola, ${CONFIG.whatsappName}! Quiero consultar una reserva en La Nancy:`, ...lines,
         'Total referencial: ' + money(calculateTotal()),
         '¿Me confirmas disponibilidad, horario y lugar de retiro? ¡Gracias!'].join('\n');
