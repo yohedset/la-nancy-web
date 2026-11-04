@@ -447,7 +447,9 @@
     const PRODUCTS = [
       { id:'margarita', category:'Pizzas medianas', name:'Margarita', price:6000, description:'Salsa de tomates La Nancy, mozzarella, fior di latte, albahaca, parmesano y oliva.', unit:'Pizza mediana' },
       { id:'pepperoni-pesto', category:'Pizzas medianas', name:'Pepperoni Pesto', price:7000, description:'Salsa de tomates La Nancy, mozzarella, pepperoni, shot de pesto y parmesano.', unit:'Pizza mediana' },
-      { id:'pizza-dog', category:'Lanzamiento', name:'Pizza Dog', price:3500, description:'Queso mozzarella, salchicha, palta y pebre de la Lucy.', unit:'Unidad' },
+      { id:'choclera', category:'Pizzas medianas', name:'Choclera', price:7000, description:'Salsa de tomates La Nancy, mozzarella, choclitos, champiñón, aceitunas, parmesano.', unit:'Pizza mediana' },
+      { id:'pizza-dog-completo', category:'Pizza Dog', name:'Completo', price:3500, description:'Salchicha española, Palta Hass, Tomate, Mayonesa (+ Opción de aderezos y pebre de La Lucy).', unit:'Unidad' },
+      { id:'pizza-dog-hot-dog', category:'Pizza Dog', name:'Hot-Dog', price:3000, description:'Salchicha española, Mostaza (+ Opción de aderezos y pebre de La Lucy).', unit:'Unidad' },
       { id:'focaccia', category:'Panadería', name:'Focaccia tradicional', price:3000, description:'Orégano, sal de Cáhuil y aceite de oliva.', unit:'Unidad' },
       { id:'pan-amasado', category:'Panadería', name:'Pan amasado artesanal', price:2000, description:'Pack de 4 unidades.', unit:'Pack de 4' }
     ];
@@ -455,7 +457,7 @@
     const clpFormat = new Intl.NumberFormat('es-CL', { maximumFractionDigits:0 });
     const money = number => '$' + clpFormat.format(number);
     const $ = id => document.getElementById(id);
-    const categories = ['Pizzas medianas', 'Lanzamiento', 'Panadería'];
+    const categories = ['Pizzas medianas', 'Pizza Dog', 'Panadería'];
     let copyRevision = 0;
 
     function makeElement(tag, className, text) {
@@ -470,7 +472,7 @@
       root.replaceChildren();
       for (const category of categories) {
         const section = makeElement('section', 'menu-category');
-        const heading = makeElement('h3', 'category-heading' + (category === 'Lanzamiento' ? ' launch' : ''));
+        const heading = makeElement('h3', 'category-heading' + (category === 'Pizza Dog' ? ' launch' : ''));
         heading.append(makeElement('span','',category));
         section.append(heading);
         if (category === 'Pizzas medianas') {
