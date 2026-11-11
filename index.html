@@ -433,9 +433,10 @@
   </footer>
   <a class="mobile-bag" id="mobile-bag" href="#reservas" aria-label="Ver pedido y continuar a reservas"><span id="mobile-bag-count">Ver pedido · 0 productos</span><span id="mobile-bag-total">$0 ↗</span></a>
 
-  <script src="/catalogo.js"></script>
+  <script src="/catalogo.js?v=20261111"></script>
   <script>
     'use strict';
+    async function initNancy() {
     document.querySelectorAll('.brand-logo').forEach(img => { img.src = document.getElementById('nancy-logo').src; });
     // EDITAR AQUÍ: datos comerciales y canales de contacto.
     const CONFIG = Object.freeze({
@@ -446,12 +447,14 @@
       instagramUrl: 'https://www.instagram.com/pizza.lanancy/'
     });
 
-    const PRODUCTS = window.LA_NANCY_CATALOG.products.filter(p => p.active);
+    document.getElementById('menu-products').textContent = 'Cargando menú…';
+    const catalog = await window.LA_NANCY_CATALOG_READY;
+    const PRODUCTS = catalog.products.filter(p => p.active).sort((a,b) => a.order-b.order);
     const quantities = Object.fromEntries(PRODUCTS.map(product => [product.id,0]));
     const clpFormat = new Intl.NumberFormat('es-CL', { maximumFractionDigits:0 });
     const money = number => '$' + clpFormat.format(number);
     const $ = id => document.getElementById(id);
-    const categories = ['Pizzas medianas', 'Pizzas grandes', 'Pizza Dog', 'Panadería'];
+    const categories = [...new Set(PRODUCTS.map(p => p.category))];
     let copyRevision = 0;
 
     function makeElement(tag, className, text) {
@@ -468,6 +471,7 @@
     function renderMenu() {
       const root = $('menu-products');
       root.replaceChildren();
+      if (!PRODUCTS.length) root.textContent = 'Por ahora no hay productos disponibles. Consulta el próximo servicio por WhatsApp.';
       for (const category of categories) {
         const section = makeElement('section', 'menu-category');
         const heading = makeElement('h3', 'category-heading' + (category === 'Pizza Dog' ? ' launch' : ''));
@@ -634,6 +638,16 @@
     $('instagram-button').addEventListener('click',reserveOnInstagram);
     renderMenu();
     updateOrder();
+    }
+    initNancy().catch(() => {
+      const root = document.getElementById('menu-products');
+      root.textContent = 'No pudimos cargar el menú. Reintenta o consulta disponibilidad por WhatsApp. ';
+      const retry = document.createElement('button');
+      retry.type = 'button';
+      retry.textContent = 'Reintentar';
+      retry.addEventListener('click', () => window.location.reload());
+      root.append(retry);
+    });
   </script>
 </body>
 </html>
